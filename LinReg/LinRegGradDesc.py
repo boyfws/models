@@ -210,6 +210,19 @@ class LinRegGD(GradOptimizer,
                 random_state: Optional[int] = None,
                 threshold: Optional[float] = None,
                 stochastic_share: Optional[float] = 0.1) -> None:
+        """
+        Initializes a class to construct a linear regression whose parameters will be found using gradient descent
+
+        :param loss_function: A loss function which is going to be minimized
+        :param stochastic: If true class wil use stochastic gradient descent,
+        share of data which will be used per gradient is set by stochastic_share
+        :param add_const: If true class wil automatically add const in fit and predict methods
+        :param learning_rate: Learning rate for gradient descent
+        :param max_iter: Maximum number of iterations for learning
+        :param random_state: Influences the choice of starting point for gradient descent
+        :param threshold: If the error reaches this level, the training will be stopped.
+        :param stochastic_share: Ignored if stochastic=False. Controls the share of data which will be used per gradient
+        """
         self._flag = 0
 
         self._learning_rate = learning_rate
