@@ -23,12 +23,15 @@ class DecisionTreeRegressor(DecisionTreeBase, CriterionStorageRegressor):
 
         self.max_features = max_features
 
+        if min_samples_leaf is None:
+            self.min_samples_leaf = 0
+        else:
+            self.min_samples_leaf = min_samples_leaf
+
         if min_samples_split is None:
             self.min_samples_split = 0
         else:
             self.min_samples_split = min_samples_split
-
-        self.min_samples_leaf = min_samples_leaf
 
         self.rng = np.random.RandomState(random_state)
 
@@ -59,29 +62,21 @@ class DecisionTreeRegressor(DecisionTreeBase, CriterionStorageRegressor):
             for el in nodes:
                 node = el[0]
                 X_node, y_node = el[1:]
+
+                if (X_node.shape[0] <= self.min_samples_split or
+                    X_node.shape[0] <= 2 * self.min_samples_leaf or
+                    depth == (self.max_depth - 1)
+                ):
+                    node.value = self._set_value(y_node)
+                    continue
+
+
                 best_feature, best_t, best_diff = self._solve_split(X_node, y_node)
 
                 condition = Condition(best_feature, best_t)
                 mask = condition(X_node)
 
-                size1 = sum(mask)
-                size2 = X_node.shape[0] - size1
-
-                if self.min_samples_leaf:
-                    flag = (
-                            size1 <= self.min_samples_leaf
-                            or size2 <= self.min_samples_leaf
-                            or size1 <= self.min_samples_split * 2
-                            or size2 <= self.min_samples_split * 2
-                        )
-                else:
-                    flag = (
-                            size1 <= self.min_samples_split * 2
-                            or
-                            size2 <= self.min_samples_split * 2
-                    )
-
-                if best_diff == np.inf or best_diff >= 0 or flag or depth == (self.max_depth - 1):
+                if best_diff == np.inf or best_diff >= 0:
                     node.value = self._set_value(y_node)
                 else:
                     node.condition = condition

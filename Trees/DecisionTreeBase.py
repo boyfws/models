@@ -7,16 +7,21 @@ class DecisionTreeBase(abc.ABC):
     max_depth: int
     max_features: int | None
     min_samples_split: int
-    min_samples_leaf: int | None
+    min_samples_leaf: int
     random_state: int | None
     criterion: Callable[[np.ndarray] , float]
     rng: np.random.default_rng
+
+    """
+    Base class for all trees, 
+    which includes universal methods for finding optimal splits
+    """
 
     @staticmethod
     def _solve_optimal_split_for_feature(
             X: np.ndarray,
             y: np.ndarray,
-            min_samples_split: int,
+            min_samples: int,
             criterion: Callable[[np.ndarray] , float]
     ) -> Tuple[float, float]:
         """
@@ -42,7 +47,7 @@ class DecisionTreeBase(abc.ABC):
             y_pos_size = y_pos.shape[0]
             y_neg_size = y_neg.shape[0]
 
-            if y_pos_size <= min_samples_split or y_neg_size <= min_samples_split:
+            if y_pos_size <= min_samples or y_neg_size <= min_samples:
                 continue
 
             split_loss = (
@@ -86,7 +91,7 @@ class DecisionTreeBase(abc.ABC):
             splits[i], losses[i] = self._solve_optimal_split_for_feature(
                 X[:, el],
                 y,
-                min_samples_split=self.min_samples_split,
+                min_samples=self.min_samples_leaf,
                 criterion=self.criterion
             )
 

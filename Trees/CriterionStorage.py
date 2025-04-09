@@ -15,6 +15,9 @@ def mae_criterion(y: np.ndarray) -> float:
 
 
 class CriterionStorageRegressor:
+    """
+    Storage class for criteria used in the evaluation of splits
+    """
     def _add_criterion(self, loss_name: str) -> None:
         if loss_name == "MSE":
             self.criterion = mse_criterion
