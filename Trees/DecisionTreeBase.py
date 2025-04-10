@@ -1,4 +1,5 @@
 from typing import Callable, Tuple
+from Node import Node
 import numpy as np
 import abc
 
@@ -11,6 +12,7 @@ class DecisionTreeBase(abc.ABC):
     random_state: int | None
     criterion: Callable[[np.ndarray] , float]
     rng: np.random.default_rng
+    start_node_: "Node"
 
     """
     Base class for all trees, 
@@ -34,7 +36,7 @@ class DecisionTreeBase(abc.ABC):
         num_samples = X.shape[0]
         p = np.arange(0.1, 1, 0.1)
 
-        quantiles = np.quantile(X, p).round(3)
+        quantiles = np.quantile(X, p).round(5)
 
         masks = X >= quantiles.reshape(-1, 1)
 
